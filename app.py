@@ -67,7 +67,7 @@ def predict():
     }
     
     try:
-        file = request.files['file']
+        file = request.files.get['file']
         if file is None:
             logging.error("No se ha proporcionado ningún archivo.")
             return jsonify({"error": "No se ha proporcionado ningún archivo"}), 400
@@ -108,7 +108,7 @@ def predict_galery():
     }
     
     try:
-        file = request.files('file')
+        file = request.files.get('file')
         if file is None:
             logging.error("No se han proporcionado archivos.")
             return jsonify({"error": "No se han proporcionado archivos"}), 400
