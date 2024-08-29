@@ -50,11 +50,14 @@ def download_and_load_model():
         logging.error(f"Error al cargar el modelo: {e}", exc_info=True)
         raise
 
-# Cargar el modelo una vez al inicio
-model = download_and_load_model()
-
 @app.route('/predict-camera', methods=['POST'])
 def predict():
+    # Cargar el modelo solo cuando se llama a la ruta de predicción
+    try:
+        model = download_and_load_model()
+    except Exception as e:
+        return jsonify({"error": "Error al cargar el modelo"}), 500
+    
     # Definimos un diccionario para mapear los índices a nombres de rostros
     class_mapping = {
         0: 'Rostro cuadrado',
@@ -62,6 +65,7 @@ def predict():
         2: 'Rostro redondo',
         3: 'Rostro triangular'
     }
+    
     try:
         file = request.files['file']
         if file is None:
