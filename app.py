@@ -90,6 +90,47 @@ def predict():
     except Exception as e:
         logging.error(f"Error durante la predicción: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/predict-gallery', methods=['POST'])
+def predict_galery():
+    # Cargar el modelo solo cuando se llama a la ruta de predicción
+    try:
+        model = download_and_load_model()
+    except Exception as e:
+        return jsonify({"error": "Error al cargar el modelo"}), 500
+    
+    # Definimos un diccionario para mapear los índices a nombres de rostros
+    class_mapping = {
+        0: 'Rostro cuadrado',
+        1: 'Rostro ovalado',
+        2: 'Rostro redondo',
+        3: 'Rostro triangular'
+    }
+    
+    try:
+        file = request.files('file')
+        if file is None:
+            logging.error("No se han proporcionado archivos.")
+            return jsonify({"error": "No se han proporcionado archivos"}), 400
+
+        img = Image.open(file.stream).convert('RGB')
+
+        # Preprocesar la imagen para Keras
+        img = img.resize((224, 224))  # Redimensionar
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)
+        img_array /= 255.0
+
+        # Realizar la inferencia
+        prediction = model.predict(img_array)
+        predicted_class_index = np.argmax(prediction, axis=1)
+        predicted_face_shape = class_mapping[predicted_class_index[0]]
+
+        return jsonify({"face_shape": predicted_face_shape})
+    
+    except Exception as e:
+        logging.error(f"Error durante la predicción: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
