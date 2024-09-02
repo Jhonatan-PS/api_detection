@@ -2,6 +2,7 @@ Flask==3.0.3
 boto3==1.35.1
 pillow==10.3.0
 tensorflow==2.17.0
+tensorrt==10.3.0
 keras==3.5.0
 numpy==1.26.4
 gunicorn==23.0.0
