@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_cors import cross_origin
 import boto3
 from io import BytesIO
 from PIL import Image
@@ -53,6 +54,7 @@ def download_and_load_model():
         raise
 
 @app.route('/predict-camera', methods=['POST'])
+@cross_origin()
 def predict():
     # Cargar el modelo solo cuando se llama a la ruta de predicción
     try:
@@ -94,6 +96,7 @@ def predict():
         return jsonify({"error": str(e)}), 500
     
 @app.route('/predict-gallery', methods=['POST'])
+@cross_origin()
 def predict_galery():
     # Cargar el modelo solo cuando se llama a la ruta de predicción
     try:
