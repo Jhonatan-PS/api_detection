@@ -72,7 +72,7 @@ def predict():
     }
     
     try:
-        file = request.files.get['file']
+        file = request.files.get('file')
         if file is None:
             logging.error("No se ha proporcionado ningún archivo.")
             return jsonify({"error": "No se ha proporcionado ningún archivo"}), 400
