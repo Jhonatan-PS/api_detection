@@ -32,27 +32,33 @@ s3 = boto3.client('s3',
 BUCKET_NAME = 'b4rb3r'
 MODEL_KEY = 'face_shape_model.h5'
 
+# Global variable to store the model
+model = None
+
 def download_and_load_model():
-    try:
-        logging.info("Intentando descargar el modelo desde S3.")
-        model_file = BytesIO()
-        s3.download_fileobj(BUCKET_NAME, MODEL_KEY, model_file)
-        model_file.seek(0)
-        logging.info("Modelo descargado con éxito.")
+    global model
+    if model is None:
+        try:
+            logging.info("Intentando descargar el modelo desde S3.")
+            model_file = BytesIO()
+            s3.download_fileobj(BUCKET_NAME, MODEL_KEY, model_file)
+            model_file.seek(0)
+            logging.info("Modelo descargado con éxito.")
 
-        # Guardar el archivo temporalmente
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.h5') as temp_model_file:
-            temp_model_file.write(model_file.getbuffer())
-            temp_model_path = temp_model_file.name
-            logging.info(f"Modelo guardado temporalmente en {temp_model_path}.")
+            # Guardar el archivo temporalmente
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.h5') as temp_model_file:
+                temp_model_file.write(model_file.getbuffer())
+                temp_model_path = temp_model_file.name
+                logging.info(f"Modelo guardado temporalmente en {temp_model_path}.")
 
-        # Cargar el modelo en el formato .h5
-        model = load_model(temp_model_path)
-        logging.info("Modelo cargado con éxito.")
-        return model
-    except Exception as e:
-        logging.error(f"Error al cargar el modelo: {e}", exc_info=True)
-        raise
+            # Cargar el modelo en el formato .h5
+            model = load_model(temp_model_path)
+            logging.info("Modelo cargado con éxito.")
+            return model
+        except Exception as e:
+            logging.error(f"Error al cargar el modelo: {e}", exc_info=True)
+            raise
+    return model
 
 @app.route('/predict-camera', methods=['POST'])
 @cross_origin()
