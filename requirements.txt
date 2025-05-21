@@ -7,4 +7,4 @@ keras==3.9.0
 numpy==1.26.4
 gunicorn==23.0.0
 gevent==24.2.1
-Flask-Cors==5.0.0
+Flask-Cors==6.0.0
